@@ -1,0 +1,1 @@
+42 5 * * * root    cd /opt/gitlab-remote-mirror && /opt/gitlab-remote-mirror/gitlab-remote-mirror.sh >> /var/log/gitlab-remote-mirror.log

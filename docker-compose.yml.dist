@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  
+  
+  front:
+    build: .
+    container_name: gitlab-remote-mirror
+    #restart: always
+    volumes:
+      - '.:/opt/gitlab-remote-mirror:ro'
+      - '/srv/gitlab/data:/var/opt/gitlab'
+  
+  
