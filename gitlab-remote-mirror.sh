@@ -51,7 +51,6 @@ for filename in $CONFIG_DIR/*.cnf; do
 		echo "Done pushing changes to the remote repository."
 
 		if [ $LFS -eq 1 ] ; then
-			echo "Pushing Git LFS changes..."
 
 			if [ ! -z "${GITLAB_LFS_OBJECTS_PATH}" ]; then
 				echo "Creating Git LFS compatible links to the GitLab LFS storage..."
@@ -86,6 +85,8 @@ for filename in $CONFIG_DIR/*.cnf; do
 				fi
 
 			fi
+			
+			echo "Pushing Git LFS changes..."
 
 			git lfs push --all "${TARGET_URL}"
 			if [ $? -ne 0 ] ; then
