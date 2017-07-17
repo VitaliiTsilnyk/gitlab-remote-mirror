@@ -54,35 +54,42 @@ for filename in $CONFIG_DIR/*.cnf; do
 
 			if [ ! -z "${GITLAB_LFS_OBJECTS_PATH}" ]; then
 				echo "Creating Git LFS compatible links to the GitLab LFS storage..."
+				
+				for IOD1 in $GITLAB_LFS_OBJECTS_PATH/*; do
+					if [ -d "${IOD1}" ]; then
 
-				git lfs ls-files -l | while read line
-				do 
-					OID=`echo $line | grep -o '^[0-9a-f]\+'`
+						for IOD2 in $IOD1/*; do
+							if [ -d "${IOD2}" ]; then
 
-					GITLAB_OID_PATH="${GITLAB_LFS_OBJECTS_PATH}/${OID:0:2}/${OID:2:2}/${OID:4}"
-					if [ ! -f "${GITLAB_OID_PATH}" ]; then
-						echo "Error! Can not find LFS object file at '${GITLAB_OID_PATH}'." 1>&2
-						exit 1
+								for IOD3 in $IOD2/*; do
+									if [ -f "${IOD3}" ]; then
+
+										GITLAB_OID_PATH="$GITLAB_LFS_OBJECTS_PATH/${IOD1##*/}/${IOD2##*/}/${IOD3##*/}"
+										if [ ! -f "${GITLAB_OID_PATH}" ]; then
+											echo "Error! Can not find LFS object file at '${GITLAB_OID_PATH}'." 1>&2
+											exit 1
+										fi
+
+										LOCAL_OID_DIR="${SOURCE_PATH}/lfs/objects/${IOD1##*/}/${IOD2##*/}"
+										mkdir -p "${LOCAL_OID_DIR}"
+										if [ $? -ne 0 ] ; then
+											echo "Error! Command failed." 1>&2
+											exit 1
+										fi
+
+										LOCAL_OID_PATH="${LOCAL_OID_DIR}/${IOD1##*/}${IOD2##*/}${IOD3##*/}"
+										ln -s -f "${GITLAB_OID_PATH}" "${LOCAL_OID_PATH}"
+										if [ $? -ne 0 ] ; then
+											echo "Error! Command failed." 1>&2
+											exit 1
+										fi
+
+									fi
+								done
+							fi
+						done
 					fi
-
-					LOCAL_OID_DIR="${SOURCE_PATH}/lfs/objects/${OID:0:2}/${OID:2:2}"
-					mkdir -p "${LOCAL_OID_DIR}"
-					if [ $? -ne 0 ] ; then
-						echo "Error! Command failed." 1>&2
-						exit 1
-					fi
-
-					LOCAL_OID_PATH="${LOCAL_OID_DIR}/${OID}"
-					ln -s -f "${GITLAB_OID_PATH}" "${LOCAL_OID_PATH}"
-					if [ $? -ne 0 ] ; then
-						echo "Error! Command failed." 1>&2
-						exit 1
-					fi
-
 				done
-				if [ $? -ne 0 ] ; then
-					exit $?
-				fi
 
 			fi
 			
